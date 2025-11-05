@@ -1,0 +1,1168 @@
+/* Global */
+:root{
+  --bg:#f4f6fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --ink:#111827;
+  --blue:#2563eb;
+  --blue-2:#4f46e5;
+  --green:#16a34a;
+  --red:#e11d48;
+  --border:#e5e7eb;
+  --shadow:0 4px 14px rgba(0,0,0,.08);
+  --sidebar-width-expanded: 280px;
+  --sidebar-width-collapsed: 80px;
+}
+*{box-sizing:border-box}
+html,body{height:100%; overflow-x: hidden;} /* Mencegah scroll di level body */
+body{margin:0; font-family:'Poppins',sans-serif; background:
+radial-gradient(#E5E7EB 1.2px, transparent 1.2px) 0 0/22px 22px,
+var(--bg); color:var(--ink);
+  color:var(--ink);
+}
+#app{
+  display:grid; 
+  grid-template-columns: var(--sidebar-width-expanded) 1fr; 
+  min-height:100vh;
+  width: 100vw; /* Memastikan lebar app sesuai layar */
+  transition: grid-template-columns .3s ease;
+}
+
+/* Area Konten Utama */
+main#content {
+  overflow-x: auto; /* HANYA area ini yang akan scroll horizontal */
+  padding: 16px;
+}
+
+/* Sidebar */
+.sidebar{
+  background:#fff; 
+  border-right:1px solid var(--border); 
+  padding:14px; 
+  position:sticky; 
+  top:0; 
+  height:100vh;
+  width: var(--sidebar-width-expanded);
+  overflow-x: hidden;
+  transition: width .3s ease;
+  z-index: 10; /* Memastikan sidebar di atas konten saat scroll */
+}
+.sb-header h2{margin:.2rem 0 .6rem 0; display: flex; align-items: center; gap: 8px;}
+.small{font-size:.86rem; color:var(--muted)}
+.muted{color:var(--muted)}
+hr{border:none; border-top:1px solid var(--border); margin:12px 0}
+
+nav#menu .menu-item{
+  display:flex; 
+  align-items: center;
+  gap: 12px;
+  width:100%; 
+  text-align:left; 
+  background:#f3f4f6; 
+  border:1px solid var(--border); 
+  padding:.6rem .9rem; 
+  border-radius:10px; 
+  margin:.4rem 0; 
+  font-weight:600; 
+  cursor:pointer;
+  white-space: nowrap;
+}
+nav#menu .menu-item.active{background:#eef2ff; border-color:#c7d2fe; color:#1f2937}
+nav#menu .menu-item .icon { font-size: 1.2rem; }
+
+.btn{border:1px solid #6c757d; border-radius:10px; padding:.6rem .9rem; font-weight:600; cursor:pointer; background:#fff;}
+.btn.primary{background:linear-gradient(135deg,#3498db,#2980b9); color:#fff; border:none;}
+.btn.secondary{background:#f3f4f6;}
+.btn.success{background:#e6f4ea; border-color:#93d1a3}
+.btn.warn{background:#fff7d6; border-color:#ffcf00}
+.btn.danger{background:#fde2e1; border-color:#e7a19d}
+.btn.full{width:100%}
+#logoutBtn { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+.input, select, textarea{width:100%; padding:.4rem .6rem; border:1px solid var(--border); border-radius:10px; background:#fff; font-family:inherit}
+label{font-size:.875rem; color:#374151; margin-bottom:.2rem; display:block}
+.row{display:grid; grid-template-columns:repeat(12,1fr); gap:12px}
+.card{background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--shadow); margin-bottom:14px}
+.main-header{background:linear-gradient(135deg,#3498db,#2980b9); padding:14px 16px; border-radius:14px; color:#fff; margin-bottom:14px}
+.center{text-align:center}
+
+/* MODIFIED: Make all subtitles in main headers white and readable */
+.main-header .small {
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 2px;
+}
+
+/* Calendar */
+.cal-wrap{padding:14px; background:#fff; border-radius:14px; box-shadow:var(--shadow)}
+ .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:16px}
+.cal-head{text-align:center; font-weight:600; color:#374151; margin-bottom:.25rem}
+.cal-cell{
+  border:3px solid var(--red);
+  border-radius:12px;
+  padding:12px;
+  min-height:120px;
+  background:#ffe2e6;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  position:relative;
+}
+.cal-cell.ok{border-color:var(--green); background:#dcfce7}
+.cal-cell.today{box-shadow:inset 0 0 0 3px var(--blue)}
+.cal-num{background:#f3f4f6; border-radius:8px; padding:.1rem .45rem; display:inline-block; font-weight:600}
+.cal-cell .labels{position:absolute; left:.55rem; bottom:.45rem; line-height:1.1}
+.legend{display:flex; gap:12px; align-items:center}
+.dot{width:10px;height:10px;border-radius:99px;display:inline-block}
+.dot.green{background:var(--green)} .dot.red{background:var(--red)} .dot.blue{background:var(--blue)}
+
+/* Spasi vertikal antar baris kalender (week rows) */
+#calBody .cal-grid + .cal-grid,
+#vCalBody .cal-grid + .cal-grid {
+  margin-top: 16px;  /* ubah angkanya bila ingin lebih renggang */
+}
+
+/* Tables */
+.table{width:100%; border-collapse:collapse; font-size:.95rem}
+.table th{background:linear-gradient(180deg,#f8fafc,#eef2f7); color:#111827; padding:.6rem .75rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border)}
+.table th:first-child{border-top-left-radius:12px}
+.table th:last-child{border-top-right-radius:12px}
+.table td{padding:.55rem .75rem; border-bottom:1px solid #f0f2f5}
+.table tr:nth-child(even) td{background:#fbfbfd}
+.table tr:nth-child(odd) td{background:#ffffff}
+.badge{display:inline-block; background:#eef2ff; border:1px solid var(--border); padding:.15rem .55rem; border-radius:10px; font-variant-numeric: tabular-nums}
+
+/* Rekap complex header & cells */
+.rekap thead tr.top th {
+  border: 1px solid #000;
+  vertical-align: middle;
+}
+.rekap th, .rekap td {
+  border: 1px solid #000;
+  text-align: center;
+  vertical-align: middle;
+}
+.rekap .acc { background: #90ee90; }
+.rekap .rej { background: #ff4d4d; }
+
+/* Blue detail table */
+.detail-head, .detail-row{display:grid; grid-template-columns:.6fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr .9fr .6fr; gap:.4rem; align-items:center}
+.detail-head{font-weight:600; background:#eef5ff; color:#1f2937; border:1px solid #dbeafe; border-top-left-radius:12px; border-top-right-radius:12px; padding:.55rem .7rem}
+.detail-row{border:1px solid #dbeafe; border-top:none; padding:.45rem .7rem}
+.chk{display:flex; justify-content:center}
+
+/* Toast */
+.toast{position:fixed; right:16px; bottom:16px; padding:10px 14px; background:#111827; color:#fff; border-radius:10px; opacity:0; transform:translateY(10px); transition:all .25s ease; pointer-events:none}
+.toast.show{opacity:1; transform:translateY(0)}
+
+/* MODIFIED: Login Styling (LAMA - DI-OVERRIDE OLEH CSS BARU DI BAWAH) */
+.login-wrap {
+    padding: 24px;
+}
+.login-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width: 900px){
+  #app{grid-template-columns:1fr}
+  .sidebar{position:relative; height:auto}
+}
+
+.cal-cell .btn.secondary{background:#fff; border:2px solid var(--blue); color:var(--blue);}
+
+/* ===== Buat Order Baru (sectioned) ===== */
+.form-section{
+  background:#f9fafb;
+  border-radius:14px;
+  padding:12px;
+  box-shadow:inset 0 0 0 1px var(--border);
+  margin-bottom:10px;
+}
+.section-title{
+  font-weight:700;
+  margin:0 0 10px 0;
+  color:#1f2937;
+}
+.form-grid{display:grid; grid-template-columns:repeat(12,1fr); gap:10px}
+
+/* MODIFIED: Restored a proper 12-column grid system */
+.form-grid .span-3{grid-column:span 3}   /* For 4 items per row */
+.form-grid .span-4{grid-column:span 4}   /* For 3 items per row */
+.form-grid .span-6{grid-column:span 6}   /* For 2 items per row */
+.form-grid .span-12{grid-column:span 12} /* For 1 item per row */
+
+/* Green full-width CTA */
+.btn.cta{
+  background:#16a34a;
+  color:#fff;
+  border:1px solid #0f8a2a;
+  font-weight:700;
+  width:100%;
+}
+.btn.cta:hover{filter:brightness(.95)}
+
+/* ===== MODIFIED: Login-only layout: Fullscreen centered (LAMA - DI-OVERRIDE) ===== */
+body.login-only #app {
+    grid-template-columns: 1fr;
+}
+body.login-only .sidebar {
+    display: none;
+}
+body.login-only #content {
+    display: flex;
+    flex-direction: column; /* Stack header and form vertically */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    margin: 0;
+    max-width: 100%;
+}
+
+/* NEW: Container for the entire login box (LAMA) */
+.login-container {
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,.1);
+    border-radius: 14px;
+    overflow: hidden; /* Important for child border-radius */
+}
+
+/* MODIFIED: Login header is now bigger and part of the container (LAMA) */
+body.login-only .main-header {
+    margin-bottom: 0;
+    border-radius: 0; /* Let parent handle rounding */
+    text-align: center;
+    padding: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+body.login-only .main-header h2 {
+    font-size: 1.6rem;
+    justify-content: center;
+}
+
+/* MODIFIED: Login card is now connected to the header (LAMA) */
+body.login-only .login-wrap.card {
+    border-radius: 0;
+    margin-bottom: 0;
+    box-shadow: none; /* Shadow is on the parent now */
+}
+
+/* === Sidebar show/hide toggle button === */
+.sidebar-toggle{
+  position:fixed;
+  bottom: 12px;  /* <<< INI PERUBAHANNYA (dari top ke bottom) */
+  left:12px;
+  width:36px;
+  height:36px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#fff;
+  box-shadow:var(--shadow);
+  font-weight:700;
+  cursor:pointer;
+  z-index:1000;
+}
+/* Hide toggle on login screen */
+body.login-only .sidebar-toggle,
+body.login-page .sidebar-toggle { display:none; } /* <-- DITAMBAHKAN .login-page */
+
+/* ===============================================================
+    NEW: Icon-Only Collapsed Sidebar Logic
+   =============================================================== */
+body.sidebar-collapsed #app {
+  grid-template-columns: var(--sidebar-width-collapsed) 1fr;
+}
+body.sidebar-collapsed .sidebar {
+  width: var(--sidebar-width-collapsed);
+  padding-left: 8px;
+  padding-right: 8px;
+}
+/* Hide all text spans when collapsed */
+body.sidebar-collapsed .text {
+  display: none;
+}
+/* Center menu items and header icon when collapsed */
+body.sidebar-collapsed .sb-header h2,
+body.sidebar-collapsed nav#menu .menu-item {
+  justify-content: center;
+  padding-left: .6rem;
+  padding-right: .6rem;
+}
+
+
+/* === Responsive Rekap table: wrapper handles scroll === */
+.rekap-wrap { 
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch;
+}
+.table.rekap {
+  table-layout: auto;
+  border-spacing: 0;
+}
+.table.rekap th, .table.rekap td { 
+  white-space: nowrap; 
+}
+#rekapTable th,
+#rekapTable td {
+  font-size: 11px;
+  padding: 4px 5px;
+}
+#rekapTable td[rowspan] {
+    vertical-align: middle;
+}
+#rekapTable .btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    width: 60px;
+    box-sizing: border-box;
+}
+.table.rekap input[type="file"]{ max-width:140px; width:100%; }
+
+
+/* === Screenshot-accurate calendar header pills === */
+.cal-head{
+  text-transform: uppercase;
+  letter-spacing:.6px;
+  font-size:.85rem;
+  background: #ffffff;
+  border:2px dotted #6aa9ff;
+  border-radius:999px;
+  padding:.35rem .8rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:.45rem;
+  box-shadow: 0 2px 0 rgba(0,0,0,.04);
+}
+
+/* === Light blue calendar cards like screenshot === */
+.cal-cell{
+  border:0px solid #5fb4ff !important;
+  border-radius:15px;
+  padding:12px;
+  min-height:120px;
+  background: linear-gradient(180deg,#dff7ff,#c8efff);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  position:relative;
+  box-shadow: var(--shadow);
+}
+.cal-cell.ok{ background: linear-gradient(180deg,#dff7ff,#c8efff) }
+.cal-cell.today{ box-shadow: inset 0 0 0 0 transparent }
+.cal-cell.selected{ box-shadow: 0 0 0 3px #3b82f6 }
+
+/* Big day number on the center */
+.cal-num{
+  position:absolute;
+  top:0px;
+  left:110px;
+  font-size:28px;
+  font-weight:700;
+  background:transparent;
+  padding:0;
+  color:#0f172a;
+}
+
+/* Two-line labels "20ft = x" & "40ft/HC = y" left aligned */
+.cal-cell .labels{
+  position:absolute;
+  left:16px;
+  bottom:54px;
+  text-align:left;
+  font-size:.9rem;
+  line-height:1.05;
+  color:#0f172a;
+}
+
+/* Button "Pilih" pill, dark blue border like screenshot */
+.btn.pick{
+  align-self:center;
+  width:100%;
+  border-radius:999px;
+  border:0px solid #1e56a3;
+  background: linear-gradient(180deg,#3498db,#1f6fb2);
+  color:#fff;
+  font-weight:700;
+}
+.btn.pick:hover{ filter:brightness(.95) }
+
+
+/* Data Outstanding - file manager & preview */
+#outstandingPreviewContainer .table-wrap {
+    overflow-x: auto;
+}
+.file-row{
+  display:flex; align-items:center; justify-content:space-between;
+  border:1px solid var(--border); background:var(--card);
+  padding:12px 14px; border-radius:12px; margin-bottom:10px; gap:12px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+.file-main{ display:flex; flex-direction:column; gap:4px; }
+.file-actions{ display:flex; gap:8px; }
+.empty{ padding:18px; border:1px dashed var(--border); border-radius:12px; background: #fff; color:#777; }
+
+
+/* === Modal (Popup) === */
+.modal{ position:fixed; inset:0; display:none; }
+.modal.show{ display:block; }
+.modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.35); }
+.modal-dialog{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(820px, 92vw); background:#fff; border-radius:16px;
+  box-shadow: var(--shadow); padding:0; overflow:hidden;
+}
+.modal-header{ display:flex; align-items:center; justify-content:space-between;
+  padding:12px 14px; background:linear-gradient(135deg,#3498db,#2980b9); color:#fff; }
+.modal-body{ padding:14px; max-height:70vh; overflow:auto; }
+
+
+/* === Vendor Orderan: small number inputs inside table === */
+.input.tiny{
+  max-width:64px;
+  text-align:center;
+  padding:.25rem .4rem;
+  border-radius:8px;
+}
+
+
+/* === Dashboard status cards === */
+.stat-card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  text-align: center;
+}
+.stat-num{ font-size: 28px; font-weight: 800; line-height: 1; }
+.stat-label{ margin-top: 6px; font-size: .9rem; color: var(--muted); font-weight: 600; }
+
+/* Performa Vendor kecil */
+.small-table{ font-size: .8rem; }
+.small-table th, .small-table td{ padding: 4px 6px; }
+.perf-small{ font-weight: 600; color: #2563eb; }
+
+/* Styling for the Report Table */
+.report-table {
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: auto;
+  width: 100%;
+}
+.report-table th,
+.report-table td {
+  border: 2px solid #d1d5db; /* Garis lebih tebal */
+  padding: 6px 8px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap; /* Memastikan tabel bisa scroll horizontal */
+}
+.report-table thead th {
+  background: #f3f4f6;
+  font-weight: 600;
+  color: var(--ink);
+}
+.report-table tbody td {
+  background: var(--card);
+}
+.report-table tbody .acc {
+  background: #e6f4ea;
+  font-weight: 600;
+  color: #166534;
+}
+
+/* ===== AESTHETIC & COMPACT REFINEMENTS ===== */
+
+/* 1. Make EMKL Availability table more compact */
+#emkl-availability-card .table {
+  font-size: 0.9rem; /* Smaller font in this table */
+}
+#emkl-availability-card .table th, 
+#emkl-availability-card .table td {
+  padding: 0.4rem 0.6rem; /* Tighter padding */
+  text-align: center;
+}
+#emkl-availability-card .table th:first-child,
+#emkl-availability-card .table td:first-child {
+  text-align: left; /* Align vendor name to the left */
+}
+#emkl-availability-card .btn {
+  padding: 0.3rem 0.8rem; /* Smaller button */
+  font-size: 0.85rem;
+}
+
+/* 2. Make "Buat Order Baru" form more compact */
+.form-section label {
+  font-size: 0.8rem;   /* Smaller label font */
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+.form-section .input, 
+.form-section select, 
+.form-section textarea {
+  font-size: 0.9rem; /* Smaller font in fields */
+  padding: 0.5rem 0.7rem; /* Adjust field padding */
+}
+.form-section {
+  padding: 14px; /* Slightly more padding inside sections */
+}
+.section-title {
+  font-size: 1rem; /* Slightly smaller section title */
+}
+
+/* === Submenu / Nested Menu Styles === */
+.menu-item.is-parent {
+  position: relative;
+}
+
+.menu-item .arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8em;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+
+body.sidebar-collapsed .menu-item .arrow {
+  display: none; /* Hide arrow in collapsed mode */
+}
+
+.menu-item.parent-active {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.submenu-container {
+  padding-left: 20px;
+  border-left: 3px solid #e0e7ff;
+  margin-left: 15px;
+  overflow: hidden;
+}
+
+.submenu-item {
+  background: #f9fafb !important;
+  width: calc(100% - 5px);
+  margin-left: 5px;
+}
+
+.submenu-item.active {
+  background: #e0e7ff !important;
+  border-color: #a5b4fc !important;
+  font-weight: 700 !important;
+  color: #3730a3 !important;
+}
+
+body.sidebar-collapsed .submenu-container {
+    display: none; /* Hide submenus completely when sidebar is icon-only */
+}
+
+/* ===== PENGECILAN TABEL VENDOR ORDERAN ===== */
+
+/* 1. Mengecilkan font dan padding di seluruh sel tabel */
+#vendor-orderan-card .table.rekap {
+  font-size: 0.8rem; /* Ukuran font lebih kecil */
+}
+#vendor-orderan-card .table.rekap th,
+#vendor-orderan-card .table.rekap td {
+  padding: 5px 8px; /* Padding lebih rapat */
+  white-space: nowrap; /* Mencegah teks turun baris jika tidak perlu */
+}
+
+/* 2. Mengecilkan ukuran input angka (Accept/Reject) */
+#vendor-orderan-card .input.tiny {
+  max-width: 50px;      /* Lebar input diperkecil */
+  padding: 4px;         /* Padding internal input dikurangi */
+  font-size: 0.8rem;    /* Font di dalam input disamakan */
+}
+
+/* 3. Mengecilkan tombol "Submit" */
+#vendor-orderan-card .btn {
+  padding: 4px 10px;    /* Tombol lebih pendek dan ramping */
+  font-size: 0.8rem;    /* Font tombol diperkecil */
+}
+
+/* ===== PERBAIKAN FINAL TAMPILAN EMKL DETAIL (SCROLL & UI POLISH) ===== */
+
+/* 1. Mengaktifkan scroll horizontal & vertikal pada container tabel detail */
+#detailPanel .table-wrap {
+    overflow-x: auto; /* PENTING: Menambah scroll horizontal */
+    overflow-y: auto;
+    max-height: 55vh; /* Bisa disesuaikan tingginya */
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+/* 2. Merapikan header dan footer di dalam panel detail */
+.detail-panel-header {
+    margin-bottom: 12px;
+}
+.detail-panel-header h4 {
+    margin: 0 0 4px 0;
+}
+.detail-panel-footer {
+    margin-top: 12px;
+}
+
+/* 3. Mengatur lebar kolom agar stabil dan tidak berantakan */
+#detailPanel .table.rekap th,
+#detailPanel .table.rekap td {
+    text-align: left; /* Teks rata kiri agar rapi */
+    white-space: nowrap; /* Mencegah teks turun baris */
+    vertical-align: middle;
+    padding: 10px 12px;
+}
+#detailPanel .table.rekap th:nth-child(1), /* No. */
+#detailPanel .table.rekap td:nth-child(1) {
+    width: 50px; text-align: center;
+}
+#detailPanel .table.rekap th:nth-child(2), /* Container No */
+#detailPanel .table.rekap td:nth-child(2) {
+    min-width: 180px;
+}
+#detailPanel .table.rekap th:nth-child(3), /* No. Seal */
+#detailPanel .table.rekap td:nth-child(3) {
+    min-width: 150px;
+}
+#detailPanel .table.rekap th:nth-child(4), /* Plat Mobil */
+#detailPanel .table.rekap td:nth-child(4) {
+    min-width: 140px;
+}
+#detailPanel .table.rekap th:nth-child(5), /* Nama Driver */
+#detailPanel .table.rekap td:nth-child(5) {
+    min-warning: 180px;
+}
+#detailPanel .table.rekap th:nth-child(8), /* Size */
+#detailPanel .table.rekap td:nth-child(8) {
+    text-align: center;
+}
+#detailPanel .table.rekap th:nth-child(9), /* Status */
+#detailPanel .table.rekap td:nth-child(9) {
+    min-width: 160px;
+}
+#detailPanel .table.rekap th:last-child, /* Aksi */
+#detailPanel .table.rekap td:last-child {
+    text-align: center;
+}
+
+/* 4. Memperbaiki tampilan input dan tombol di dalam tabel */
+#detailPanel .input.tiny {
+    border: 1px solid #ccc;
+    transition: all .2s ease;
+}
+#detailPanel .input.tiny:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+
+/* ===============================================================
+    BARU: STYLES UNTUK HALAMAN REPORT DURASI (VERSI UPDATE)
+   =============================================================== */
+
+#report-durasi-page {
+  /* Hapus padding default dari main#content agar halaman durasi bisa full-width */
+  margin: -16px; 
+}
+
+/* Top bar (dari kode lama, masih bagus) */
+#report-durasi-page .topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.85);backdrop-filter:saturate(150%) blur(6px);box-shadow:0 2px 10px rgba(2,6,23,.06);
+}
+#report-durasi-page .brand{display:flex;align-items:center;gap:10px}
+#report-durasi-page .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--blue-2);box-shadow:0 0 8px var(--blue-2)}
+#report-durasi-page .clock{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted)}
+
+/* Layout (dari kode lama) */
+#report-durasi-page .container{max-width:1600px;margin:18px auto;padding:0 16px;display:grid;gap:16px}
+
+/* BARU: Style untuk control bar dari screenshot */
+#report-durasi-page .controls-bar {
+  background: #f0f5ff; /* Latar belakang biru muda */
+  border: 1px solid #bde;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Agar responsif */
+  gap: 16px;
+  box-shadow: 0 1px 4px rgba(2,6,23,.04);
+}
+
+#report-durasi-page .control-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#report-durasi-page .switch-label {
+  font-weight: 500;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+#report-durasi-page .control-group-spacer {
+  flex-grow: 1; /* Mendorong filter ke kanan */
+}
+
+#report-durasi-page .controls-bar .details {
+  margin-left: 10px;
+}
+#report-durasi-page .controls-bar .details summary {
+  color: var(--blue-2);
+  font-weight: 500;
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* BARU: Style untuk legend bar dari screenshot */
+#report-durasi-page .legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(2,6,23,.04);
+}
+#report-durasi-page .legend-bar .legend-item {
+  font-size: 13px;
+  color: var(--muted);
+}
+#report-durasi-page .legend-bar .legend-item b {
+  font-weight: 700;
+}
+#report-durasi-page .legend-bar .legend-item b.green {
+  color: #15803d; /* Hijau */
+}
+#report-durasi-page .legend-bar .legend-item b.yellow {
+  color: #b45309; /* Kuning */
+}
+#report-durasi-page .legend-bar .legend-item b.red {
+  color: #b91c1c; /* Merah */
+}
+
+/* Kontrol LAMA disembunyikan */
+#report-durasi-page .controls,
+#report-durasi-page .legend {
+  display: none;
+}
+
+/* Input (dari kode lama) */
+#report-durasi-page .input{
+  background:#ffffff;
+  border:1px solid var(--border);
+  padding:8px 10px;
+  border-radius:10px;
+  color:var(--ink);
+}
+
+/* Switch (dari kode lama) */
+#report-durasi-page .switch{position:relative;display:inline-block;width:48px;height:26px}
+#report-durasi-page .switch input{opacity:0;width:0;height:0}
+#report-durasi-page .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.2s;border-radius:999px}
+#report-durasi-page .slider:before{position:absolute;content:'';height:20px;width:20px;left:4px;top:3px;background:white;border-radius:50%;transition:.2s}
+#report-durasi-page .switch input:checked + .slider{background:linear-gradient(90deg,var(--blue-2),var(--green))}
+#report-durasi-page .switch input:checked + .slider:before{transform:translateX(22px)}
+
+/* Table (dari kode lama, masih bagus) */
+#report-durasi-page .table-wrap{overflow:auto;border-radius:14px;border:1px solid var(--border)}
+#report-durasi-page #grid{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);color:var(--ink)}
+#report-durasi-page #grid thead th{
+  position:sticky;top:0;background:#f3f6fb;border-bottom:1px solid var(--border);
+  text-align:center;font-weight:600;padding:10px 8px;font-size:13px;white-space:nowrap;
+}
+#report-durasi-page #grid tbody td{
+  padding:10px 8px;border-bottom:1px solid #f3f6fb;font-size:13px;vertical-align:top;white-space:nowrap;
+  text-align: center; /* Data di screenshot rata tengah */
+}
+#report-durasi-page #grid tbody tr:hover{background:#f8fafc}
+
+/* Badge Durasi */
+#report-durasi-page .diff-badge{padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-variant-numeric:tabular-nums}
+#report-durasi-page .diff-ok{background:rgba(22,163,74,.10);color:#065f46;border-color:rgba(16,185,129,.35)}
+#report-durasi-page .diff-warn{background:rgba(245,158,11,.12);color:#92400e;border-color:rgba(245,158,11,.35)}
+#report-durasi-page .diff-bad{background:rgba(239,68,68,.10);color:#7f1d1d;border-color:rgba(239,68,68,.35)}
+/* BARU: Badge untuk Durasi Keseluruhan (sesuai screenshot) */
+#report-durasi-page .diff-total{background:rgba(245,158,11,.12);color:#92400e;border:1px solid #f59e0b; font-weight: 500;}
+#report-durasi-page .hidden{display:none}
+
+/* Stronger table borders (dari kode lama) */
+#report-durasi-page #grid, 
+#report-durasi-page #grid th, 
+#report-durasi-page #grid td {
+  border: 1px solid var(--border) !important;
+}
+#report-durasi-page #grid thead th {
+  border-bottom: 2px solid var(--border) !important;
+}
+
+/* BARU: Class untuk menyembunyikan/menampilkan kolom selisih */
+#report-durasi-page.hide-selisih th.col-selisih,
+#report-durasi-page.hide-selisih td.col-selisih {
+  display: none;
+}
+
+/* * ===============================================================
+ * STYLES UNTUK HALAMAN RATE TRANSPORTER (VERSI FINAL TERAKHIR)
+ * ===============================================================
+ */
+
+/* Style untuk header section (20ft, 40ft/HC, Combo) */
+.rate-table tr.rate-section-header {
+  background-color: #fff7d6; /* KUNING PENUH UNTUK BARIS */
+}
+
+.rate-table tr.rate-section-header td {
+  background-color: #fff7d6; /* KUNING PENUH UNTUK SEL */
+  color: #111827 !important; /* Teks jadi hitam (PENTING) */
+  font-weight: 700;
+  text-align: left !important; /* Paksa rata kiri */
+  padding-left: 12px !important;
+  font-size: 1.1rem;
+  /* Hapus border aneh di dalam baris header */
+  border-top: none;
+  border-bottom: none;
+}
+
+/* 1. Default alignment untuk tabel ini */
+.rate-table th, 
+.rate-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+  text-align: left; /* Default rata kiri */
+}
+
+/* 2. Buat SEMUA header (th) rata tengah */
+.rate-table th {
+  text-align: center;
+}
+
+/* 3. PERBAIKAN: Ratakan tengah kolom Tipe, Angka, dll */
+.rate-table td:nth-child(3), /* Container Type (INI PERUBAHANNYA) */
+.rate-table td:nth-child(4), /* Handling */
+.rate-table td:nth-child(5), /* Trucking */
+.rate-table td:nth-child(6), /* Total */
+.rate-table td:nth-child(7), /* Alloc % */
+.rate-table td:nth-child(8) { /* Alloc Qty */
+  text-align: center;
+}
+
+/* 4. Beri highlight pada kolom Rank dan Total */
+.rate-table td:nth-child(1),  /* Rank */
+.rate-table td:nth-child(6) { /* Total */
+  font-weight: 700;
+  color: var(--blue-2);
+}
+
+/* 5. Kembalikan warna zebra default, HINDARI .rate-section-header */
+.rate-table tbody tr:not(.rate-section-header):nth-child(even) td {
+  background-color: #fbfbfd;
+}
+.rate-table tbody tr:not(.rate-section-header):nth-child(odd) td {
+  background-color: #ffffff;
+}
+
+/* * ===============================================================
+ * BARU: STYLE UNTUK LOGO SIDEBAR
+ * ===============================================================
+ */
+.sidebar-logo {
+  width: 100%; /* Logo akan mengisi lebar sidebar */
+  height: auto; /* Menjaga rasio aspek */
+  margin-bottom: 12px; /* Memberi spasi ke "Trucking Planner" */
+}
+
+
+/* ===============================================================
+    BARU: CSS LOGIN DARI FILE style.css BARU ANDA
+   =============================================================== */
+
+/* * CATATAN: 
+ * Saya telah memberi prefix "body.login-page" pada semua style di bawah ini.
+ * Ini mencegah style login baru Anda (seperti 'body', 'h1', 'button') 
+ * merusak style dashboard Anda yang sudah ada.
+ */
+
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+body.login-page * {
+    box-sizing: border-box;
+}
+
+body.login-page {
+    background: #f6f5f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    height: 100vh;
+    margin: 0; /* Hapus margin negatif */
+    overflow: hidden; /* Sembunyikan scroll di halaman login */
+}
+
+/* Override #app dan #content agar fullscreen */
+body.login-page #app {
+    display: block;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+    width: 100vw;
+}
+body.login-page main#content {
+    display: flex; /* <-- KUNCI UTAMA */
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+}
+
+
+body.login-page h1 {
+    font-weight: bold;
+    margin: 0;
+}
+
+body.login-page p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+body.login-page span {
+    font-size: 12px;
+}
+
+body.login-page a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+/* === GRADASI BARU (BIRU "SEDANG") DI TOMBOL === */
+body.login-page button {
+    border-radius: 20px;
+    border: none; 
+    /* GRADASI BARU: #2c3e50 ke #3498db */
+    background: linear-gradient(to right, #2c3e50, #3498db); 
+    
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    cursor: pointer;
+}
+/* === AKHIR PERUBAHAN === */
+
+
+body.login-page button:active {
+    transform: scale(0.95);
+}
+
+body.login-page button:focus {
+    outline: none;
+}
+
+body.login-page button.ghost {
+    background: transparent;
+    border: 1px solid #FFFFFF;
+}
+
+
+body.login-page form {
+    background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+body.login-page input {
+    /* override .input global */
+    background-color: #eee;
+    border: none;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 0; /* Hapus border-radius dari .input global */
+    font-family: 'Montserrat', sans-serif;
+}
+
+body.login-page .container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    position: relative;
+    overflow: hidden; 
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+}
+
+body.login-page .form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+
+/* Form Sign In (Vendor) ada di KIRI */
+body.login-page .sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+/* Form Sign Up (Admin) tersembunyi */
+body.login-page .sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+/* Container Overlay ada di KANAN */
+body.login-page .overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden; 
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+/* === GRADASI BARU (BIRU "SEDANG") DI OVERLAY === */
+body.login-page .overlay {
+    /* GRADASI BARU: #2c3e50 ke #3498db */
+    background: #2c3e50; /* Fallback */
+    background: -webkit-linear-gradient(to right, #2c3e50, #3498db);
+    background: linear-gradient(to right, #2c3e50, #3498db);
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+/* === AKHIR PERUBAHAN === */
+
+
+/* KUNCI LENGKUNGANNYA */
+body.login-page .overlay-container {
+    border-radius: 100px 0 0 100px;
+}
+body.login-page .overlay {
+    border-radius: 100px 0 0 100px;
+}
+body.login-page .container.right-panel-active .overlay-container {
+    border-radius: 0 100px 100px 0;
+}
+body.login-page .container.right-panel-active .overlay {
+    border-radius: 0 100px 100px 0;
+}
+
+
+body.login-page .overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+/* Panel "Welcome Back!" (Admin) tersembunyi dulu */
+body.login-page .overlay-left {
+    transform: translateX(-20%);
+}
+
+/* Panel "Hello, Friend!" (Vendor) terlihat */
+body.login-page .overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+body.login-page .social-container {
+    margin: 20px 0;
+}
+
+body.login-page .social-container a {
+    border: 1px solid #DDDDDD;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    height: 40px;
+    width: 40px;
+}
+
+/* STATE ACTIVE (TAMPILAN DEFAULT KITA) */
+body.login-page .container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+}
+
+body.login-page .container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: login-show 0.6s;
+}
+
+body.login-page .container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+body.login-page .container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+body.login-page .container.right-panel-active .overlay-left {
+    transform: translateX(0);
+}
+
+body.login-page .container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}
+
+
+@keyframes login-show {
+    0%, 49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+    
+    50%, 100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}

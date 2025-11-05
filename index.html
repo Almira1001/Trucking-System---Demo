@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trucking Planner System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="sb-header">
+        
+        <img src="./logo_ik.png?v=123" alt="Indah Kiat Logo" class="sidebar-logo">
+        
+        <h2>🚛 Trucking Planner</h2>
+        <div class="small">Hi, <b id="sb-username">-</b></div>
+        <div class="small">Role: <b id="sb-role">-</b></div>
+        <div class="small" id="sb-vendor-wrap" style="display:none;">EMKL: <b id="sb-vendor">-</b></div>
+      </div>
+<hr>
+      <nav id="menu" aria-label="Main menu"></nav>
+      <hr>
+      <button id="logoutBtn" class="btn full danger">Logout</button>
+      <div class="small muted" id="lastUpdate"></div>
+    </aside>
+
+    <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="true">«</button>
+    <main id="content">
+      </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="margin:0">Detail</h3>
+        <button id="modalClose" class="btn danger" aria-label="Tutup">Tutup</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+<script src="script.js"></script>
+
+    <div id="toast"></div>
+    
+</body>
+</html>
+</body>
+</html>
