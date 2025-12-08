@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"> 
 </head>
-<body>
+<body class="default-collapsed">
   <div id="app">
     <aside id="sidebar" class="sidebar">
       <div class="sb-header">
@@ -28,9 +28,16 @@
       <div class="small muted" id="lastUpdate"></div>
     </aside>
 
-    <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="true">«</button>
+    <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">«</button>
+    
     <main id="content">
       </main>
+  </div>
+
+  <div id="notificationBell" class="notification-bell" style="display:none">
+      <span class="bell-icon">🔔</span>
+      <div id="notificationContent" class="notification-content">
+      </div>
   </div>
 
   <div id="toast" class="toast"></div>
@@ -52,7 +59,5 @@
 
     <div id="toast"></div>
     
-</body>
-</html>
 </body>
 </html>
