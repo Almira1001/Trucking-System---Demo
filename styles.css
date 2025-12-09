@@ -361,6 +361,10 @@ textarea {
   color: #fff;
   margin: 0 0 0 0;
   box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  /* Kunci untuk membuat header fixed/sticky */
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .main-header h3 {
@@ -2160,6 +2164,7 @@ body.login-page .overlay-panel p {
   .main-header {
     background: #fff !important;
     color: #000 !important;
+    position: relative !important; /* Non-sticky saat print */
   }
   
   .card {
@@ -2257,3 +2262,23 @@ body.login-page .overlay-panel p {
 #vendorOrderTable td.rej {
     padding: 0px !important; 
 }
+
+/* --- REVISI 2: STYLING BARU UNTUK REPORT PERFORMA VENDOR FILTER --- */
+#performance-filter-controls .form-grid {
+    gap: 10px; 
+    align-items: flex-end;
+    margin-bottom: 0;
+}
+#performance-filter-controls .span-3,
+#performance-filter-controls .span-4,
+#performance-filter-controls .span-5 {
+    /* Menggunakan 1fr di bawah 1024px */
+    grid-column: span 4; 
+}
+
+@media (min-width: 1024px) {
+    #performance-filter-controls .span-3 { grid-column: span 3; }
+    #performance-filter-controls .span-4 { grid-column: span 4; }
+    #performance-filter-controls .span-5 { grid-column: span 5; }
+}
+/* --- AKHIR REVISI 2 --- */
