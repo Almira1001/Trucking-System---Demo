@@ -147,6 +147,12 @@ const defaultState = {
   notifications: [], 
   editing_order_id: null, 
   editing_container_id_vendor: null, 
+  // REVISI 2: State untuk Performa Vendor
+  performance_filter: {
+    period: 'week',
+    startDate: null,
+    endDate: null
+  }
 };
 let state = Object.assign({}, defaultState, loadState()||{});
 
@@ -976,45 +982,64 @@ function buildStatusDashboardInner(){
   return html;
 }
 
-function buildVendorPerformanceCard(isReportView = false){
-  let data = VENDORS_DEFAULT.map(v => {
-    let acc = 0, rej = 0;
-    for (const oid in state.containers){
-      const order = state.orders.find(o => o.order_id === oid);
-      if (!order || order.vendor !== v) continue;
-      (state.containers[oid] || []).forEach(r => {
-        if (r.accept === true) acc++;
-        else if (r.accept === false) rej++;
-      });
-    }
-    const total = acc + rej;
-    const perf = total > 0 ? Math.round((acc / total) * 100) : 0;
+function getFilteredPerformanceData(startDateStr, endDateStr){
     
-    return { name: v, accept: acc, reject: rej, total: total, performa: perf };
-  });
+    const startDate = startDateStr ? parseISODate(startDateStr) : new Date(0);
+    const endDate = endDateStr ? parseISODate(endDateStr) : new Date(8640000000000000);
+    
+    const vendorPerformance = VENDORS_DEFAULT.map(v => {
+        let acc = 0, rej = 0;
+        
+        // Filter orders based on Tgl Stuffing (order creation date is used as proxy)
+        const relevantOrders = state.orders.filter(o => {
+            const stuffingDate = parseISODate(o.tgl_stuffing);
+            // Ignore time part for filtering
+            return o.vendor === v && stuffingDate >= startDate && stuffingDate <= endDate;
+        });
 
-  let rows = data.map(item => {
-    return `<tr>
-      <td>${item.name}</td>
-      <td class="center">${item.accept}</td>
-      <td class="center">${item.reject}</td>
-      <td class="perf-small center">${item.performa}%</td>
-    </tr>`;
-  }).join("");
+        relevantOrders.forEach(o => {
+             (state.containers[o.order_id] || []).forEach(r => {
+                // HANYA hitung kontainer yang sudah direspons (Accept atau Reject)
+                if (r.accept === true) acc++;
+                else if (r.accept === false) rej++;
+            });
+        });
 
-  return {
-      html: `
-        <div class="card" style="padding: 0;">
-          <div class="table-wrap no-scroll"> <table class="table small-table">
-              <thead>
-                <tr><th>EMKL</th><th class="center">Accept</th><th class="center">Reject</th><th class="center">Performa</th></tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
-        </div>`,
-      data: data
-  };
+        const total = acc + rej;
+        const perf = total > 0 ? Math.round((acc / total) * 100) : 0;
+        
+        return { name: v, accept: acc, reject: rej, total: total, performa: perf };
+    });
+    
+    return vendorPerformance;
+}
+
+function buildVendorPerformanceCard(isReportView = false, data = null){
+    
+    const finalData = data || getFilteredPerformanceData(null, null);
+
+    let rows = finalData.map(item => {
+        return `<tr>
+          <td>${item.name}</td>
+          <td class="center">${item.accept}</td>
+          <td class="center">${item.reject}</td>
+          <td class="perf-small center">${item.performa}%</td>
+        </tr>`;
+    }).join("");
+
+    return {
+        html: `
+            <div class="card" style="padding: 0;">
+              <div class="table-wrap no-scroll"> <table class="table small-table">
+                  <thead>
+                    <tr><th>EMKL</th><th class="center">Accept</th><th class="center">Reject</th><th class="center">Performa</th></tr>
+                  </thead>
+                  <tbody>${rows}</tbody>
+                </table>
+            </div>
+            </div>`,
+        data: finalData
+    };
 }
 
 
@@ -2065,6 +2090,12 @@ function renderAdminStatus(){
           <label>ETD (end)</label>
           <input id="status_etd_end" type="date" class="input">
         </div>
+        
+        <div class="col" style="grid-column: span 3;">
+          <label>Cari DN</label>
+          <input id="status_search_dn" type="text" class="input" placeholder="Cari No DN...">
+        </div>
+        
         <div class="col" style="grid-column: span 3; display:flex; align-items:flex-end;">
             <button id="btnDownloadStatusTruck" class="btn success full">⬇️ Download Excel</button>
         </div>
@@ -2140,6 +2171,9 @@ function renderAdminStatus(){
     const etdEndEl = document.getElementById("status_etd_end");
     const etdStart = etdStartEl.value ? parseISODate(etdStartEl.value) : null;
     const etdEnd = etdEndEl.value ? parseISODate(etdEndEl.value) : null;
+    
+    // REVISI 3: Tambahkan filter DN
+    const searchDnTerm = document.getElementById("status_search_dn").value.trim().toLowerCase(); 
 
     const orders = state.orders.filter(o => {
         const d = parseISODate(o.tgl_stuffing);
@@ -2158,7 +2192,13 @@ function renderAdminStatus(){
             }
         }
         
-        return stuffingOk && vendorOk && etdOk;
+        // REVISI 3: Logika filter DN
+        let dnOk = true;
+        if (searchDnTerm) {
+            dnOk = (o.no_dn || []).some(dn => dn.toLowerCase().includes(searchDnTerm));
+        }
+        
+        return stuffingOk && vendorOk && etdOk && dnOk;
         
     }).reverse();
 
@@ -2282,6 +2322,8 @@ function renderAdminStatus(){
   rEnd.onchange = buildStatusTable;
   document.getElementById("status_etd_start").onchange = buildStatusTable;
   document.getElementById("status_etd_end").onchange = buildStatusTable;
+  // REVISI 3: Tambahkan listener untuk input DN
+  document.getElementById("status_search_dn").oninput = buildStatusTable;
 
   document.getElementById("btnDownloadStatusTruck").onclick = () => {
     const dataToExport = [];
@@ -2776,6 +2818,18 @@ function renderVendorOrderan() {
 }
 
 /* ===================== VENDOR: LIST ORDERAN (Add Detail) ===================== */
+function isContainerValid(value) {
+    // Format: 4 huruf - 7 angka (contoh: ABCD-1234567)
+    // Regex: ^[A-Z]{4}[0-9]{7}$ - mencari 4 huruf diikuti 7 angka, tanpa strip.
+    const strictRegex = /^[A-Z]{4}[0-9]{7}$/; 
+    
+    // Hapus semua karakter non-alfanumerik dan ubah ke kapital
+    const cleanedValue = value.replace(/[^A-Z0-9]/g, '').toUpperCase(); 
+    
+    // Check if the cleaned value matches the strict format
+    return strictRegex.test(cleanedValue);
+}
+
 function renderVendorListDetail() {
     const vendor = state.vendor_name;
     const allOrders = state.orders.filter(o => o.vendor === vendor && o.summary_status !== 'Pending' && o.summary_status !== 'Rejected');
@@ -2911,9 +2965,55 @@ function renderVendorListDetail() {
                 
                 const contEl = document.getElementById(`edit_cont_${uniqueId}`);
                 const sealEl = document.getElementById(`edit_seal_${uniqueId}`);
+                
+                const newContainerValue = contEl ? (contEl.tagName === 'TEXTAREA' ? contEl.value.trim() : contEl.value.trim()) : c.no_container;
+                const newSealValue = sealEl ? (sealEl.tagName === 'TEXTAREA' ? sealEl.value.trim() : sealEl.value.trim()) : c.no_seal;
 
-                c.no_container = contEl ? (contEl.tagName === 'TEXTAREA' ? contEl.value.trim() : contEl.value.trim()) : c.no_container;
-                c.no_seal = sealEl ? (sealEl.tagName === 'TEXTAREA' ? sealEl.value.trim() : sealEl.value.trim()) : c.no_seal;
+                // REVISI 4: Validasi Container
+                let containerValidated = true;
+                if (newContainerValue && c.size !== 'Combo') {
+                    if (!isContainerValid(newContainerValue)) {
+                        toast(`Kontainer ${newContainerValue} tidak valid. Format: 4 Huruf & 7 Angka (Contoh: ABCD1234567).`);
+                        containerValidated = false;
+                    }
+                } else if (newContainerValue && c.size === 'Combo') {
+                    // Validasi untuk combo (multi-baris)
+                    const containers = newContainerValue.split('\n').map(s => s.trim()).filter(s => s);
+                    if (containers.length < 2) {
+                        toast("Order Combo harus memiliki minimal 2 nomer kontainer.");
+                        containerValidated = false;
+                    } else if (!containers.every(cont => isContainerValid(cont))) {
+                        toast("Minimal satu nomer kontainer Combo tidak valid. Format: 4 Huruf & 7 Angka.");
+                        containerValidated = false;
+                    }
+                }
+                
+                // REVISI 4: Validasi Seal (Sama dengan Container)
+                let sealValidated = true;
+                if (newSealValue) {
+                     // Check if seal number follows the same convention for consistency
+                     if (c.size !== 'Combo' && !isContainerValid(newSealValue)) {
+                          toast(`Nomor Seal ${newSealValue} tidak valid. Format: 4 Huruf & 7 Angka (Contoh: ABCD1234567).`);
+                          sealValidated = false;
+                     } else if (c.size === 'Combo') {
+                        // Validasi untuk combo seal
+                        const seals = newSealValue.split('\n').map(s => s.trim()).filter(s => s);
+                        if (seals.length < 2) {
+                            toast("Order Combo Seal harus memiliki minimal 2 nomer seal.");
+                            sealValidated = false;
+                        } else if (!seals.every(seal => isContainerValid(seal))) {
+                             toast("Minimal satu nomer seal Combo tidak valid. Format: 4 Huruf & 7 Angka.");
+                             sealValidated = false;
+                        }
+                     }
+                }
+
+                if (!containerValidated || !sealValidated) {
+                    return; // Stop saving if validation fails
+                }
+
+                c.no_container = newContainerValue;
+                c.no_seal = newSealValue;
                 
                 c.no_mobil = document.getElementById(`edit_mobil_${uniqueId}`).value.trim();
                 c.nama_supir = document.getElementById(`edit_supir_${uniqueId}`).value.trim();
@@ -3137,7 +3237,7 @@ function renderOutstanding(){
     }
   }
 }
-
+// Baris 1001
 /* ===================== ADMIN: RATE TRANSPORTER ===================== */
 function renderRateTransporter(){
   
@@ -3382,9 +3482,9 @@ function getDataFromOutstanding(dnToFind) {
           partie20: p20Index !== -1 && row[p20Index] !== undefined ? row[p20Index] : null,
           partie40: p40Index !== -1 && row[p40Index] !== undefined ? row[p40Index]: null,
           sc: scIndex !== -1 && row[scIndex] !== undefined ? row[scIndex] : null,
-          forwardingAgent: fwdAgentIndex !== -1 && row[fwdAgentIndex] !== undefined ? row[fwdAgentIndex] : null,
-          productGroup: prodGroupIndex !== -1 && row[prodGroupIndex] !== undefined ? row[prodGroupIndex] : null,
-          productForm: prodFormIndex !== -1 && row[prodFormIndex] !== undefined ? row[prodFormIndex] : null,
+          forwardingAgent: fwdAgentIndex !== -1 && row[forwardingAgentIndex] !== undefined ? row[forwardingAgentIndex] : null,
+          productGroup: prodGroupIndex !== -1 && row[productGroupIndex] !== undefined ? row[productGroupIndex] : null,
+          productForm: prodFormIndex !== -1 && row[productFormIndex] !== undefined ? row[productFormIndex] : null,
           nw: nwIndex !== -1 && row[nwIndex] !== undefined ? row[nwIndex] : null,
         };
       }
@@ -3740,15 +3840,66 @@ function renderReport() {
 }
 
 
-/* ===================== ADMIN: REPORT PERFORMA VENDOR ===================== */
+/* ===================== ADMIN: REPORT PERFORMA VENDOR (REVISI 2) ===================== */
 function renderReportPerformaVendor() {
-    const { html: tableHtml, data: rawData } = buildVendorPerformanceCard(true);
+    
+    // Set default filter if null
+    if (!state.performance_filter.startDate && !state.performance_filter.endDate) {
+        // Default to 'week' logic
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 6);
+        state.performance_filter.startDate = toISODate(startDate);
+        state.performance_filter.endDate = toISODate(endDate);
+    }
+    
+    const { startDate, endDate, period } = state.performance_filter;
+    
+    const performanceData = getFilteredPerformanceData(startDate, endDate);
+    const { html: tableHtml, data: rawData } = buildVendorPerformanceCard(true, performanceData);
+
+    const periodOptions = [
+        { value: 'week', label: 'Minggu Terakhir' },
+        { value: 'month', label: 'Bulan Terakhir' },
+        { value: 'year', label: 'Tahun Terakhir' },
+        { value: 'custom', label: 'Custom Range' }
+    ];
+    
+    const periodSelectHtml = periodOptions.map(opt => 
+        `<option value="${opt.value}" ${period === opt.value ? 'selected' : ''}>${opt.label}</option>`
+    ).join('');
 
     content.innerHTML = `
         <div class="main-header">
             <h3 style="margin:0">📈 Admin — Report Performa Vendor</h3>
             <div class="small">Tabel ringkasan performa EMKL berdasarkan jumlah kontainer yang di-Accept dan di-Reject.</div>
         </div>
+        
+        <div class="card">
+            <h3 style="margin:0 0 10px 0;">Filter Performa</h3>
+            <div id="performance-filter-controls">
+                <div class="form-grid">
+                    <div class="span-3">
+                        <label>Pilih Periode</label>
+                        <select id="perf_period_select" class="input">
+                            ${periodSelectHtml}
+                        </select>
+                    </div>
+                    <div class="span-4">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" id="perf_start_date" class="input" value="${startDate || ''}" ${period !== 'custom' ? 'disabled' : ''}>
+                    </div>
+                    <div class="span-4">
+                        <label>Tanggal Selesai</label>
+                        <input type="date" id="perf_end_date" class="input" value="${endDate || ''}" ${period !== 'custom' ? 'disabled' : ''}>
+                    </div>
+                    <div class="span-1" style="display:flex; align-items:flex-end;">
+                        <button id="btnApplyFilter" class="btn primary full">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin:0;">Ringkasan Performa</h3>
@@ -3758,10 +3909,92 @@ function renderReportPerformaVendor() {
             ${tableHtml}
             
             <div class="small muted" style="margin-top: 20px;">
-                * Performa dihitung dari total kontainer yang sudah direspons (Accept + Reject).
+                * Performa dihitung dari total kontainer yang sudah direspons (Accept + Reject) untuk order yang Tgl Stuffing-nya di antara <b>${formatDisplayDate(startDate)}</b> dan <b>${formatDisplayDate(endDate)}</b>.
             </div>
         </div>
     `;
+    
+    const periodSelect = document.getElementById('perf_period_select');
+    const startInput = document.getElementById('perf_start_date');
+    const endInput = document.getElementById('perf_end_date');
+    const applyBtn = document.getElementById('btnApplyFilter');
+
+    function calculateDates(selectedPeriod) {
+        const end = new Date();
+        let start = new Date(end);
+        
+        if (selectedPeriod === 'week') {
+            start.setDate(end.getDate() - 6);
+        } else if (selectedPeriod === 'month') {
+            start.setMonth(end.getMonth() - 1);
+            start.setDate(start.getDate() + 1); // Start from the day after one month ago
+        } else if (selectedPeriod === 'year') {
+            start.setFullYear(end.getFullYear() - 1);
+            start.setDate(start.getDate() + 1);
+        } else {
+             // Custom: use current state values
+             return { start: state.performance_filter.startDate || toISODate(start), end: state.performance_filter.endDate || toISODate(end) };
+        }
+        return { start: toISODate(start), end: toISODate(end) };
+    }
+
+    periodSelect.onchange = (e) => {
+        const selected = e.target.value;
+        startInput.disabled = selected !== 'custom';
+        endInput.disabled = selected !== 'custom';
+
+        if (selected !== 'custom') {
+            const { start, end } = calculateDates(selected);
+            startInput.value = start;
+            endInput.value = end;
+        } else {
+             // Reset custom range to current state value if available
+             startInput.value = state.performance_filter.startDate || '';
+             endInput.value = state.performance_filter.endDate || '';
+        }
+    };
+    
+    startInput.onchange = () => {
+        if (periodSelect.value === 'custom') {
+            state.performance_filter.startDate = startInput.value;
+            saveState();
+        }
+    };
+     endInput.onchange = () => {
+        if (periodSelect.value === 'custom') {
+            state.performance_filter.endDate = endInput.value;
+            saveState();
+        }
+    };
+
+    applyBtn.onclick = () => {
+        let finalStart = startInput.value;
+        let finalEnd = endInput.value;
+        const selectedPeriod = periodSelect.value;
+        
+        if (selectedPeriod !== 'custom') {
+            const calculatedDates = calculateDates(selectedPeriod);
+            finalStart = calculatedDates.start;
+            finalEnd = calculatedDates.end;
+        }
+
+        if (!finalStart || !finalEnd) {
+            toast("Tanggal mulai dan selesai wajib diisi.");
+            return;
+        }
+        
+        if (parseISODate(finalStart) > parseISODate(finalEnd)) {
+            toast("Tanggal mulai tidak boleh melebihi tanggal selesai.");
+            return;
+        }
+        
+        state.performance_filter.period = selectedPeriod;
+        state.performance_filter.startDate = finalStart;
+        state.performance_filter.endDate = finalEnd;
+        saveState();
+        renderReportPerformaVendor(); 
+        toast("Filter Performa diterapkan.");
+    };
 
     document.getElementById("btnDownloadPerformance").onclick = () => {
         if (typeof XLSX === "undefined") {
@@ -3769,6 +4002,11 @@ function renderReportPerformaVendor() {
             return;
         }
         
+        if (performanceData.length === 0) {
+            toast("Tidak ada data untuk diunduh pada rentang filter ini.");
+            return;
+        }
+
         const dataToExport = rawData.map(d => ({
             "EMKL": d.name,
             "Accept (Qty)": d.accept,
@@ -3780,7 +4018,8 @@ function renderReportPerformaVendor() {
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Performa Vendor");
-        XLSX.writeFile(workbook, "Report_Performa_Vendor.xlsx");
+        const fileName = `Report_Performa_Vendor_${startDate}_to_${endDate}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
         toast("Ekspor Performa Vendor berhasil.");
     };
 }
